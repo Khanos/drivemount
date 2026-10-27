@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=DriveMount
+GenericName=Google Drive Connection Manager
+Comment=Your Google Drive, right in your Linux files.
+Exec=drivemount
+Icon=io.github.drivemount.app
+Terminal=false
+Categories=Utility;Network;FileTools;
+Keywords=Google;Drive;Cloud;rclone;
+StartupNotify=true
+StartupWMClass=drivemount

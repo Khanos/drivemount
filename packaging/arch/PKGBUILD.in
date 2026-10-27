@@ -1,0 +1,33 @@
+# Build the local release archive produced by packaging/source-archive.sh.
+pkgname=drivemount
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc='Your Google Drive, right in your Linux files'
+arch=('x86_64' 'aarch64')
+license=('MIT')
+# ring bundles C code; GCC LTO objects cannot be consumed by Rust's linker.
+# Rust's Cargo release-profile LTO remains enabled.
+options=('!lto' '!debug')
+depends=('webkit2gtk-4.1' 'gtk3' 'librsvg' 'systemd' 'util-linux' 'xdg-utils' 'polkit')
+makedepends=('rust' 'cargo' 'nodejs' 'npm' 'pkgconf')
+checkdepends=('rclone' 'fuse3')
+optdepends=('rclone: Google Drive connector (1.70 or newer)' 'fuse3: mount Google Drive as a folder')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('@SOURCE_SHA256@')
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  npm ci --no-audit --no-fund
+  npm run tauri -- build --no-bundle
+}
+check() {
+  cd "$srcdir/$pkgname-$pkgver"
+  npm test
+  cargo test --locked --no-default-features --manifest-path src-tauri/Cargo.toml
+}
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  install -Dm755 src-tauri/target/release/drivemount "$pkgdir/usr/bin/drivemount"
+  install -Dm644 packaging/drivemount.desktop "$pkgdir/usr/share/applications/io.github.drivemount.app.desktop"
+  install -Dm644 src-tauri/icons/icon.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/io.github.drivemount.app.svg"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

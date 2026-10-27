@@ -1,0 +1,29 @@
+import js from "@eslint/js";
+import globals from "globals";
+import tseslint from "typescript-eslint";
+import hooks from "eslint-plugin-react-hooks";
+export default tseslint.config(
+  {
+    ignores: [
+      "dist",
+      "node_modules",
+      "src-tauri/target",
+      "playwright-report",
+      "test-results",
+      "packaging/arch/src/**",
+      "packaging/arch/pkg/**",
+      "release/**",
+    ],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    plugins: { "react-hooks": hooks },
+    rules: {
+      ...hooks.configs.recommended.rules,
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
+);
